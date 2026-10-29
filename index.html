@@ -30,9 +30,11 @@ summary{list-style:none;cursor:pointer;border:1px solid var(--line);background:v
 .panel{position:absolute;z-index:5;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px;max-height:280px;overflow:auto;min-width:210px;margin-top:4px}
 .ck{display:flex;gap:8px;align-items:flex-start;margin:3px 0;color:var(--ink);font-size:.95rem}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;cursor:pointer;text-align:left;width:100%;display:flex;flex-direction:column;justify-content:flex-start;align-items:flex-start}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;cursor:pointer;text-align:left;width:100%;position:relative;font:inherit;color:inherit;display:flex;flex-direction:column;justify-content:flex-start;align-items:flex-start}
 .card:hover{border-color:var(--acc)}
-.card b{display:block;margin-bottom:6px}
+.card b{display:block;margin-bottom:6px;padding-right:76px}
+.acts{position:absolute;top:8px;right:8px;display:flex;gap:6px}
+.acts button{padding:1px 9px;line-height:1.5}
 .chip{display:inline-block;background:var(--chip);border-radius:99px;padding:1px 10px;font-size:.8rem;margin:0 4px 4px 0}
 .chip.plan{background:var(--sf);color:#241a00}
 .chip.warn{background:#c0392b;color:#fff}
@@ -134,7 +136,9 @@ function filtered(){
     return all?q.every(hit):q.some(hit);
   });
 }
-const card=r=>`<button class="card" onclick="detail('${esc(r.id)}')"><b>${esc(r.title)}</b>${isPlanned(r)?'<span class="chip plan">Planned</span>':''}${warn(r)}<div class="mut">${triedTxt(r)}</div></button>`;
+const card=(r,m)=>{const id=esc(r.id),b=(fn,t,l)=>`<button title="${l}" aria-label="${l}" onclick="event.stopPropagation();${fn}">${t}</button>`;
+  const acts=m==='plan'?b(`made('${id}')`,'✓','Mark as tried')+b(`setPlan('${id}',false)`,'✕','Remove from plan'):b(`editForm('${id}',1)`,'✎','Edit')+(isPlanned(r)?'':b(`setPlan('${id}',true)`,'+','Add to plan'));
+  return `<div class="card" tabindex="0" role="button" onclick="detail('${id}')" onkeydown="if(event.target===this&&event.key==='Enter')detail('${id}')"><div class="acts">${acts}</div><b>${esc(r.title)}</b>${m!=='plan'&&isPlanned(r)?'<span class="chip plan">Planned</span>':''}${warn(r)}<div class="mut">${triedTxt(r)}</div></div>`};
 function render(){
   TL=uniq(recipes.flatMap(tagsOf)).sort();
   sel=new Set([...sel].filter(t=>TL.includes(t)));
@@ -142,7 +146,7 @@ function render(){
   $('#tagpanel').innerHTML=TL.map(t=>`<label class="ck"><input type="checkbox" data-t="${esc(t)}" ${sel.has(t)?'checked':''}>${esc(t)}</label>`).join('')+(sel.size?'<button data-t="">Clear</button>':'')||'<span class="mut">No tags yet</span>';
   const av=avoid();$('#hidewrap').style.display=av.length?'':'none';$('#hidetxt').textContent='Hide '+av.join(', ');
   const pl=recipes.filter(isPlanned).sort((a,b)=>a.title.localeCompare(b.title));
-  $('#plan').innerHTML=pl.length?`<h2>Meal plan</h2>${pl.map(r=>`<div class="pl"><a href="#" onclick="detail('${esc(r.id)}');return false">${esc(r.title)}</a><button onclick="made('${esc(r.id)}')">Made it</button><button onclick="setPlan('${esc(r.id)}',false)" aria-label="Remove from plan">✕</button></div>`).join('')}`:'';
+  $('#plan').innerHTML=pl.length?`<h2>Meal plan</h2><div class="grid">${pl.map(r=>card(r,'plan')).join('')}</div>`:'';
   const f=filtered(),t=$('#tf').value;
   if(t)f.sort((a,b)=>(days(b)??1e9)-(days(a)??1e9));
   const shown=t&&!showAll?f.slice(0,5):f;
@@ -175,12 +179,14 @@ function detail(id){
 const upd=(id,fn)=>a=>a.map(r=>r.id===id?fn(r):r);
 async function tried(id){const d=$('#td').value||today();if(await mutate(upd(id,r=>({...r,tried:uniq([...A(r.tried),d]).sort()})),'Mark tried'))detail(id)}
 async function untry(id,d){if(await mutate(upd(id,r=>({...r,tried:A(r.tried).filter(x=>x!==d)})),'Remove tried date'))detail(id)}
-async function setPlan(id,v){if(await mutate(upd(id,r=>({...r,planned:v})),v?'Plan recipe':'Unplan recipe')&&$('#dlg').open)detail(id)}
-async function made(id){await mutate(upd(id,r=>({...r,tried:uniq([...A(r.tried),today()]).sort(),planned:false})),'Made from plan')}
+async function setPlan(id,v){if(await mutate(upd(id,r=>({...r,planned:v})),v?'Plan recipe':'Unplan recipe')){if($('#dlg').open)detail(id);else toast(v?'Added to plan':'Removed from plan')}}
+async function made(id){if(await mutate(upd(id,r=>({...r,tried:uniq([...A(r.tried),today()]).sort(),planned:false})),'Made from plan'))toast('Marked as tried')}
 async function del(id){const r=recipes.find(x=>x.id===id);if(confirm('Delete "'+r.title+'"?')&&await mutate(a=>a.filter(x=>x.id!==id),'Delete recipe: '+r.title)){close();toast('Deleted')}}
 
 function addTag(i){const f=$('#f-tags');const c=L(f.value);if(!c.includes(TL[i]))c.push(TL[i]);f.value=c.join(', ')}
-function editForm(id){
+let ret=false;
+function editForm(id,c){
+  ret=!!c;
   const r=recipes.find(x=>x.id===id)||{};
   show(`<h2 style="margin-top:0">Edit recipe</h2>
   <label>Title</label><input id="f-title" value="${esc(r.title)}">
@@ -192,13 +198,13 @@ function editForm(id){
   <label>Ingredients (one per line)</label><textarea id="f-ing">${esc(A(r.ingredients).join('\n'))}</textarea>
   <label>Steps (one per line)</label><textarea id="f-steps">${esc(A(r.steps).join('\n'))}</textarea>
   <label>Notes</label><textarea id="f-notes" style="min-height:50px">${esc(r.notes)}</textarea>
-  <div class="row"><button class="p" onclick="saveForm('${esc(id)}')">Save recipe</button><button onclick="detail('${esc(id)}')">Cancel</button></div>`);
+  <div class="row"><button class="p" onclick="saveForm('${esc(id)}')">Save recipe</button><button onclick="${ret?'close()':`detail('${esc(id)}')`}">Cancel</button></div>`);
 }
 async function saveForm(id){
   const ln=s=>$(s).value.split('\n').map(x=>x.trim()).filter(Boolean);
   const rec={title:$('#f-title').value.trim(),servings:$('#f-serv').value.trim(),time:$('#f-time').value.trim(),source_url:$('#f-url').value.trim(),ingredients:ln('#f-ing'),steps:ln('#f-steps'),notes:$('#f-notes').value.trim(),tags:uniq(L($('#f-tags').value)),allergens:uniq(L($('#f-all').value)),audience:undefined,protein:undefined};
   if(!rec.title){toast('Add a title');return}
-  if(await mutate(upd(id,r=>({...r,...rec})),'Edit recipe: '+rec.title)){detail(id);toast('Saved')}
+  if(await mutate(upd(id,r=>({...r,...rec})),'Edit recipe: '+rec.title)){ret?close():detail(id);toast('Saved')}
 }
 
 function prompt_(url,text){
