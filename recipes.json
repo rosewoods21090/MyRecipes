@@ -1,0 +1,17 @@
+[
+  {
+    "id": "sample1",
+    "title": "Sample: Moong dal khichdi",
+    "audience": "both",
+    "protein": "veg",
+    "servings": "3",
+    "time": "30 min",
+    "source_url": "",
+    "ingredients": ["1/2 cup rice", "1/2 cup yellow moong dal", "1 tsp ghee", "1/4 tsp turmeric", "3 cups water"],
+    "steps": ["Rinse rice and dal.", "Pressure cook everything for 4 whistles.", "Mash lightly and serve with ghee."],
+    "notes": "Delete this sample once you add your own recipes.",
+    "tags": ["Indian", "one-pot"],
+    "added": "2026-10-29",
+    "tried": []
+  }
+]
