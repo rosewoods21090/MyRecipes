@@ -18,14 +18,16 @@ button.d{color:#c0392b}
 button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--sf);outline-offset:1px}
 input,select,textarea{width:100%;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
 textarea{min-height:90px;resize:vertical}
-.bar{display:grid;grid-template-columns:1fr auto auto auto;gap:8px}
-@media(max-width:620px){.bar{grid-template-columns:1fr 1fr}.bar input{grid-column:1/-1}}
+.bar{display:grid;grid-template-columns:1fr auto;gap:8px}
+@media(max-width:620px){.bar{grid-template-columns:1fr}}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;cursor:pointer;text-align:left;width:100%}
 .card:hover{border-color:var(--acc)}
 .card b{display:block;margin-bottom:6px}
 .chip{display:inline-block;background:var(--chip);border-radius:99px;padding:1px 10px;font-size:.8rem;margin:0 4px 4px 0}
-.chip.baby{background:var(--sf);color:#241a00}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.tg{border-radius:99px;padding:2px 12px;font-size:.85rem;background:var(--chip);border-color:transparent}
+.tg.on{background:var(--acc);color:var(--acct);font-weight:600}
 .mut{color:var(--mut);font-size:.88rem}
 dialog{width:min(640px,calc(100% - 20px));max-height:92vh;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink);padding:18px}
 dialog::backdrop{background:#0008}
@@ -37,12 +39,8 @@ li{margin:4px 0}
 #toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 14px;border-radius:8px;display:none;max-width:90%}
 </style></head><body><main>
 <header><h1>My Recipes</h1><button class="p" onclick="addFlow()">Add recipe</button><button onclick="settings()" aria-label="Settings">⚙</button></header>
-<div class="bar">
- <input id="q" placeholder="Search by ingredients, e.g. spinach, paneer" oninput="render()">
- <select id="mode" onchange="render()"><option value="any">Any of these</option><option value="all">All of these</option></select>
- <select id="fa" onchange="render()"><option value="">All audiences</option><option>baby</option><option>adult</option><option>both</option></select>
- <select id="fp" onchange="render()"><option value="">All proteins</option><option>veg</option><option>egg</option><option>chicken</option><option>fish</option><option>meat</option><option>other</option></select>
-</div>
+<div class="bar"><input id="q" placeholder="Search by ingredients, e.g. spinach, paneer" oninput="render()"><select id="mode" onchange="render()"><option value="any">Any of these</option><option value="all">All of these</option></select></div>
+<div id="tagbar" class="tags"></div>
 <div id="rec"></div>
 <h2 id="lh"></h2><div id="list" class="grid"></div>
 </main>
@@ -51,7 +49,8 @@ li{margin:4px 0}
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const today=()=>new Date().toLocaleDateString('en-CA');
-const AUD=['baby','adult','both'],PRO=['veg','egg','chicken','fish','meat','other'];
+let sel=new Set(),TL=[];
+const tagsOf=r=>[...new Set([...(r.tags||[]),r.audience,r.protein].filter(Boolean).map(t=>String(t).toLowerCase().trim()))];
 let recipes=[];
 
 function toast(m){const t=$('#toast');t.textContent=m;t.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>t.style.display='none',4000)}
@@ -94,14 +93,13 @@ async function load(){
 
 const last=r=>(r.tried||[]).slice().sort().pop();
 const ago=d=>Math.floor((Date.now()-new Date(d+'T00:00:00'))/864e5);
-const chips=r=>`<span class="chip ${r.audience==='baby'?'baby':''}">${esc(r.audience)}</span><span class="chip">${esc(r.protein)}</span>`;
+const chips=r=>tagsOf(r).map(t=>`<span class="chip">${esc(t)}</span>`).join('');
 const triedTxt=r=>{const l=last(r);return l?`Last made ${ago(l)===0?'today':ago(l)+' days ago'}`:'Not tried yet'};
 
 function filtered(){
   const q=$('#q').value.toLowerCase().split(',').map(s=>s.trim()).filter(Boolean),all=$('#mode').value==='all';
-  const a=$('#fa').value,p=$('#fp').value;
   return recipes.filter(r=>{
-    if((a&&r.audience!==a)||(p&&r.protein!==p))return false;
+    if(sel.size){const t=tagsOf(r);if(![...sel].every(x=>t.includes(x)))return false}
     if(!q.length)return true;
     const hay=(r.ingredients||[]).map(s=>s.toLowerCase());
     const hit=t=>hay.some(i=>i.includes(t))||(r.title||'').toLowerCase().includes(t);
@@ -110,6 +108,9 @@ function filtered(){
 }
 const card=(r,extra)=>`<button class="card" onclick="detail('${esc(r.id)}')"><b>${esc(r.title)}</b>${chips(r)}<div class="mut">${extra||triedTxt(r)}</div></button>`;
 function render(){
+  TL=[...new Set(recipes.flatMap(tagsOf))].sort();
+  sel=new Set([...sel].filter(t=>TL.includes(t)));
+  $('#tagbar').innerHTML=TL.map(t=>`<button class="tg ${sel.has(t)?'on':''}" data-t="${esc(t)}">${esc(t)}</button>`).join('')+(sel.size?'<button class="tg" data-t="">Clear</button>':'');
   const f=filtered();
   const sugg=$('#q').value.trim()?[]:f.map(r=>({r,s:last(r)?ago(last(r)):45})).filter(x=>x.s>=21).sort((a,b)=>b.s-a.s).slice(0,4);
   $('#rec').innerHTML=sugg.length?`<h2>Time to make again</h2><div class="grid">${sugg.map(x=>card(x.r,last(x.r)?`Last made ${x.s} days ago`:'Not tried yet')).join('')}</div>`:'';
@@ -124,7 +125,7 @@ $('#dlg').addEventListener('click',e=>{if(e.target.id==='dlg')close()});
 function detail(id){
   const r=recipes.find(x=>x.id===id);if(!r)return;
   const t=(r.tried||[]).slice().sort().reverse();
-  show(`<h2 style="margin-top:0;font-size:1.4rem">${esc(r.title)}</h2>${chips(r)}${(r.tags||[]).map(x=>`<span class="chip">${esc(x)}</span>`).join('')}
+  show(`<h2 style="margin-top:0;font-size:1.4rem">${esc(r.title)}</h2>${chips(r)}
   <div class="mut">${[r.servings&&'Serves '+esc(r.servings),r.time&&esc(r.time)].filter(Boolean).join(' · ')}</div>
   ${r.source_url?`<p><a href="${esc(r.source_url)}" target="_blank" rel="noopener noreferrer">Original recipe link</a></p>`:''}
   <h2>Ingredients</h2><ul>${(r.ingredients||[]).map(i=>`<li>${esc(i)}</li>`).join('')}</ul>
@@ -138,49 +139,92 @@ async function tried(id){const d=$('#td').value||today();if(await mutate(a=>a.ma
 async function untry(id,d){if(await mutate(a=>a.map(r=>r.id===id?{...r,tried:(r.tried||[]).filter(x=>x!==d)}:r),'Remove tried date'))detail(id)}
 async function del(id){const r=recipes.find(x=>x.id===id);if(confirm('Delete "'+r.title+'"?')&&await mutate(a=>a.filter(x=>x.id!==id),'Delete recipe: '+r.title)){close();toast('Deleted')}}
 
+function addTag(i){const f=$('#f-tags');const c=f.value.split(',').map(x=>x.trim()).filter(Boolean);if(!c.includes(TL[i]))c.push(TL[i]);f.value=c.join(', ')}
 function editForm(id,draft){
   const r=draft||recipes.find(x=>x.id===id)||{};
-  const opt=(L,v)=>L.map(o=>`<option ${o===v?'selected':''}>${o}</option>`).join('');
   show(`<h2 style="margin-top:0">${id?'Edit recipe':'Review and save'}</h2>
   <label>Title</label><input id="f-title" value="${esc(r.title)}">
-  <div class="two"><div><label>Audience</label><select id="f-aud">${opt(AUD,r.audience||'adult')}</select></div><div><label>Protein</label><select id="f-pro">${opt(PRO,r.protein||'veg')}</select></div>
-  <div><label>Servings</label><input id="f-serv" value="${esc(r.servings)}"></div><div><label>Time</label><input id="f-time" value="${esc(r.time)}"></div></div>
+  <label>Tags (comma-separated)</label><input id="f-tags" value="${esc(tagsOf(r).join(', '))}">
+  <div class="tags" style="margin-top:6px">${TL.map((t,i)=>`<button class="tg" onclick="addTag(${i})">${esc(t)}</button>`).join('')}</div>
+  <div class="two"><div><label>Servings</label><input id="f-serv" value="${esc(r.servings)}"></div><div><label>Time</label><input id="f-time" value="${esc(r.time)}"></div></div>
   <label>Source link</label><input id="f-url" value="${esc(r.source_url)}">
   <label>Ingredients (one per line)</label><textarea id="f-ing">${esc((r.ingredients||[]).join('\n'))}</textarea>
   <label>Steps (one per line)</label><textarea id="f-steps">${esc((r.steps||[]).join('\n'))}</textarea>
   <label>Notes</label><textarea id="f-notes" style="min-height:50px">${esc(r.notes)}</textarea>
-  <label>Extra tags (comma-separated)</label><input id="f-tags" value="${esc((r.tags||[]).join(', '))}">
   <div class="row"><button class="p" onclick="saveForm('${esc(id||'')}')">Save recipe</button><button onclick="${id?`detail('${esc(id)}')`:'close()'}">Cancel</button></div>`);
 }
 async function saveForm(id){
   const L=s=>$(s).value.split('\n').map(x=>x.trim()).filter(Boolean);
-  const rec={title:$('#f-title').value.trim(),audience:$('#f-aud').value,protein:$('#f-pro').value,servings:$('#f-serv').value.trim(),time:$('#f-time').value.trim(),source_url:$('#f-url').value.trim(),ingredients:L('#f-ing'),steps:L('#f-steps'),notes:$('#f-notes').value.trim(),tags:$('#f-tags').value.split(',').map(x=>x.trim()).filter(Boolean)};
+  const rec={title:$('#f-title').value.trim(),servings:$('#f-serv').value.trim(),time:$('#f-time').value.trim(),source_url:$('#f-url').value.trim(),ingredients:L('#f-ing'),steps:L('#f-steps'),notes:$('#f-notes').value.trim(),tags:[...new Set($('#f-tags').value.split(',').map(x=>x.trim().toLowerCase()).filter(Boolean))],audience:undefined,protein:undefined};
   if(!rec.title){toast('Add a title');return}
   const ok=id?await mutate(a=>a.map(r=>r.id===id?{...r,...rec}:r),'Edit recipe: '+rec.title)
     :await mutate(a=>[...a,{id:Date.now().toString(36),...rec,added:today(),tried:[]}],'Add recipe: '+rec.title);
   if(ok){id?detail(id):close();toast('Saved')}
 }
 
-const SCHEMA='{"title":"","audience":"baby | adult | both","protein":"veg | egg | chicken | fish | meat | other","servings":"","time":"","ingredients":["quantity + ingredient, one per item"],"steps":["one step per item"],"notes":"","tags":["cuisine, meal type"]}';
 function prompt_(url,text){
-  return `Extract the recipe ${text?'from the text below':'from this link: '+url} and reply with ONLY one JSON object, in a code block, in exactly this shape:\n${SCHEMA}\n\nRules: audience is "baby" if it is made for babies or toddlers, "adult" for regular meals, "both" if suitable for both. protein is the main protein ("veg" if none). Keep quantities in the ingredients. Do not invent anything that is not in the source.`+(text?`\n\nRecipe text:\n${text}`:'\nIf you cannot open the link, or the recipe is not in its text (for example it only appears in a video), reply only with CANNOT_EXTRACT instead of guessing.');
+  const src=(url?'Link: '+url+'\n':'')+(text?'Recipe text:\n'+text:'');
+  return `You are helping me add a recipe to my personal recipe database, which is a JSON file. Follow these instructions exactly.
+
+INPUT
+I will give you either (a) a link to a recipe (website, YouTube, Instagram), or (b) the recipe text itself (caption, transcript, or pasted page). Use only what is in that source. If both a link and text are given, use the text and keep the link as source_url.
+- If I gave only a link and you cannot open it, or the recipe is not in the page text (for example it is only spoken or shown in a video), reply with only the word CANNOT_EXTRACT and nothing else. Do not guess or reconstruct a recipe from the title.
+- If the source is missing a detail (servings, time, quantities), leave that field as an empty string "" or omit that detail from the ingredient line. Never invent values.
+
+OUTPUT
+Reply with ONLY one JSON object inside a single code block. No text before or after it, no trailing comma, no comments. Use exactly this shape and these field names:
+
+{
+  "id": "",
+  "title": "",
+  "servings": "",
+  "time": "",
+  "source_url": "",
+  "ingredients": [],
+  "steps": [],
+  "notes": "",
+  "tags": [],
+  "added": "",
+  "tried": []
+}
+
+FIELD RULES
+- id: lowercase slug of the title using only a-z, 0-9 and hyphens, followed by a hyphen and 4 random characters (e.g. "palak-paneer-k3x9"). It must be unique.
+- title: the recipe's name, in plain text.
+- servings: a string like "4" or "2 adults + 1 toddler", or "".
+- time: total time as a string like "35 min", or "".
+- source_url: the link I gave you, or "" if I gave text only.
+- ingredients: an array of strings, one ingredient per item, each with its quantity and unit as written in the source (e.g. "1 cup basmati rice", "2 tbsp ghee"). Keep the source's units. Do not merge or drop items.
+- steps: an array of strings, one step per item, in order, written as clear instructions. Do not number them.
+- notes: tips, substitutions or baby-friendly adjustments mentioned in the source, as one string, or "".
+- tags: an array of 3 to 8 short lowercase tags. ALWAYS include: (1) who it is for: "baby" if made for babies or toddlers, "adult" for a regular meal, or both "baby" and "adult" if it suits both (as written or with a simple tweak mentioned in the source); (2) the main protein, one of "veg", "egg", "chicken", "fish", "meat" ("veg" if there is no meat, fish or egg; dairy and lentils count as veg). Then add cuisine, meal type or method tags (e.g. "indian", "breakfast", "one-pot"). Use the same word every time for the same thing.
+- added: today's date as YYYY-MM-DD, which is the date I give you below.
+- tried: always an empty array [].
+
+JSON RULES
+- Valid JSON only: double quotes, escape any quotes inside strings, no line breaks inside strings.
+- Write the recipe in English, translating if the source is in another language.
+
+SOURCE
+${src||'(none provided)'}
+Today's date: ${today()}`;
 }
 function addFlow(){
   show(`<h2 style="margin-top:0">Add a recipe</h2>
   <label>1. Recipe link (Instagram, YouTube, website)</label><input id="a-url" placeholder="https://">
   <div class="row"><button class="p" onclick="cp(prompt_($('#a-url').value.trim()))">Copy prompt for AI chat</button></div>
   <p class="mut">Paste it into your AI chat. If it replies CANNOT_EXTRACT, use the text option below.</p>
-  <details><summary>Could not extract? Paste the recipe text instead</summary><label>Recipe text or video transcript</label><textarea id="a-text"></textarea>
-  <div class="row"><button onclick="cp(prompt_('',$('#a-text').value.trim()))">Copy prompt with text</button></div></details>
+  <details><summary>Link will not open? Use the recipe text instead</summary><label>Recipe text or video transcript</label><textarea id="a-text"></textarea>
+  <div class="row"><button onclick="cp(prompt_($('#a-url').value.trim(),$('#a-text').value.trim()))">Copy prompt with text</button></div></details>
   <label>2. Paste the AI's reply here</label><textarea id="a-json" placeholder='{"title": ...}'></textarea>
   <div class="row"><button class="p" onclick="parseReply()">Continue</button><button onclick="close()">Cancel</button></div>`);
 }
 async function cp(t){if(!t){toast('Add a link or text first');return}try{await navigator.clipboard.writeText(t);toast('Prompt copied')}catch{toast('Copy failed')}}
 function parseReply(){
-  const t=$('#a-json').value,s=t.indexOf('{'),e=t.lastIndexOf('}');
+  const t=$('#a-json').value,a=t.indexOf('{'),b=t.lastIndexOf('}');
   try{
-    const j=JSON.parse(t.slice(s,e+1));
-    editForm('',{...j,source_url:$('#a-url').value.trim(),audience:AUD.includes(j.audience)?j.audience:'adult',protein:PRO.includes(j.protein)?j.protein:'other'});
+    const j=JSON.parse(t.slice(a,b+1));
+    editForm('',{...j,source_url:$('#a-url').value.trim()||j.source_url||''});
   }catch{toast(t.includes('CANNOT_EXTRACT')?'Extraction failed. Use the recipe text option.':'That is not valid JSON. Ask the chat to resend only the JSON.')}
 }
 function settings(){
@@ -196,5 +240,6 @@ function saveSettings(){
   Object.keys(o).forEach(k=>!o[k]&&delete o[k]);
   localStorage.setItem('cfg',JSON.stringify(o));close();load();
 }
+$('#tagbar').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const t=b.dataset.t;if(!t)sel.clear();else if(sel.has(t))sel.delete(t);else sel.add(t);render()});
 load();
 </script></body></html>
