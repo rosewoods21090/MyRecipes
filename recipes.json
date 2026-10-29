@@ -279,5 +279,30 @@
     "added": "2026-10-29",
     "tried": [],
     "planned": true
+  },
+  {
+    "id": "mvtaiham0",
+    "title": "Moong Dal Paneer Chilla",
+    "servings": "",
+    "time": "",
+    "source_url": "https://www.instagram.com/reel/DbGrLGNpKOl/",
+    "ingredients": [
+      "Moong dal",
+      "Paneer"
+    ],
+    "steps": [],
+    "notes": "Easy to digest and packed with plant-based protein, iron, and fiber. Paneer added for an extra protein and calcium boost.",
+    "tags": [
+      "baby",
+      "veg",
+      "breakfast",
+      "indian"
+    ],
+    "allergens": [
+      "dairy"
+    ],
+    "added": "2026-10-29",
+    "tried": [],
+    "planned": false
   }
 ]
