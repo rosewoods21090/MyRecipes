@@ -2,13 +2,15 @@
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Our Cookbook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#edf1ea;--card:#fbfcfa;--ink:#1d2a22;--mut:#5f6f65;--acc:#2f5d46;--acct:#fff;--sf:#e2a400;--line:#d3dccf;--chip:#dde7d8}
-@media(prefers-color-scheme:dark){:root{--bg:#141b17;--card:#1d2722;--ink:#e8efe9;--mut:#9bb0a2;--acc:#6fbf94;--acct:#10201a;--sf:#f0b92a;--line:#2f3d35;--chip:#2a3830}}
+:root{--bg:#edf1ea;--card:#fbfcfa;--ink:#1d2a22;--mut:#5f6f65;--acc:#2f5d46;--acct:#fff;--sf:#e2a400;--line:#d3dccf;--chip:#dde7d8;--link:#2f6fd6}
+@media(prefers-color-scheme:dark){:root{--bg:#141b17;--card:#1d2722;--ink:#e8efe9;--mut:#9bb0a2;--acc:#6fbf94;--acct:#10201a;--sf:#f0b92a;--line:#2f3d35;--chip:#2a3830;--link:#7db8ff}}
 *{box-sizing:border-box}
-body{margin:0;font:16px/1.55 system-ui,-apple-system,Segoe UI,sans-serif;background:var(--bg);color:var(--ink)}
+body{margin:0;font:16px/1.55 Nunito,system-ui,-apple-system,Segoe UI,sans-serif;background:var(--bg);color:var(--ink)}
 main{max-width:980px;margin:0 auto;padding:16px}
 header{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+a{color:var(--link)}
 h1{margin:0;flex:1;font-size:1.6rem;letter-spacing:-.02em}
 h2{font-size:1.05rem;margin:20px 0 8px}
 button,select,input,textarea,summary{font:inherit;color:inherit}
@@ -28,10 +30,11 @@ summary{list-style:none;cursor:pointer;border:1px solid var(--line);background:v
 .panel{position:absolute;z-index:5;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px;max-height:280px;overflow:auto;min-width:210px;margin-top:4px}
 .ck{display:flex;gap:8px;align-items:flex-start;margin:3px 0;color:var(--ink);font-size:.95rem}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;cursor:pointer;text-align:left;width:100%}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;cursor:pointer;text-align:left;width:100%;display:flex;flex-direction:column;justify-content:flex-start;align-items:flex-start}
 .card:hover{border-color:var(--acc)}
 .card b{display:block;margin-bottom:6px}
 .chip{display:inline-block;background:var(--chip);border-radius:99px;padding:1px 10px;font-size:.8rem;margin:0 4px 4px 0}
+.chip.plan{background:var(--sf);color:#241a00}
 .chip.warn{background:#c0392b;color:#fff}
 .mut{color:var(--mut);font-size:.88rem}
 .pl{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:4px 0}
@@ -53,7 +56,7 @@ li{margin:4px 0}
  <select id="tf" onchange="showAll=false;render()"><option value="">Any time</option><option value="never">Not tried yet</option><option value="week">Made this week</option><option value="2w">Made over 2 weeks ago</option><option value="1m">Made over a month ago</option><option value="3m">Made over 3 months ago</option></select>
  <label id="hidewrap" class="ck" style="margin:0;display:none"><input type="checkbox" id="hide" onchange="render()"><span id="hidetxt"></span></label>
 </div>
-<div id="plan"></div><div id="rec"></div>
+<div id="plan"></div>
 <h2 id="lh"></h2><div id="list" class="grid"></div><div id="more" class="row"></div>
 </main>
 <dialog id="dlg"></dialog><div id="toast"></div>
@@ -110,9 +113,13 @@ async function load(){
 const last=r=>(r.tried||[]).slice().sort().pop();
 const ago=d=>Math.floor((Date.now()-new Date(d+'T00:00:00'))/864e5);
 const days=r=>{const l=last(r);return l?ago(l):null};
-const fmtD=d=>{const n=ago(d);return n===0?'Today':n===-1?'Tomorrow':new Date(d+'T00:00:00').toLocaleDateString(undefined,{weekday:'short',day:'numeric',month:'short'})};
-const chips=r=>tagsOf(r).map(t=>`<span class="chip">${esc(t)}</span>`).join('')+flags(r).map(f=>`<span class="chip warn">⚠ ${esc(f)}</span>`).join('');
-const triedTxt=r=>{const d=days(r);return d===null?'Not tried yet':`Last made ${d===0?'today':d+' days ago'}`};
+const rel=d=>{const n=ago(d);if(n<=0)return 'today';if(n===1)return 'yesterday';if(n<7)return n+' days ago';if(n<14)return 'last week';if(n<30)return Math.floor(n/7)+' weeks ago';if(n<365){const m=Math.max(1,Math.floor(n/30));return m===1?'1 month ago':m+' months ago'}const y=Math.floor(n/365);return y===1?'1 year ago':y+' years ago'};
+const fmtMD=d=>{const x=new Date(d+'T00:00:00'),o={month:'short',day:'numeric'};if(x.getFullYear()!==new Date().getFullYear())o.year='numeric';return x.toLocaleDateString('en-US',o)};
+const fmtT=d=>rel(d)+' · '+fmtMD(d);
+const isPlanned=r=>Array.isArray(r.planned)?r.planned.length>0:!!r.planned;
+const warn=r=>flags(r).map(f=>`<span class="chip warn">⚠ ${esc(f)}</span>`).join('');
+const chips=r=>tagsOf(r).map(t=>`<span class="chip">${esc(t)}</span>`).join('')+warn(r);
+const triedTxt=r=>{const l=last(r);return l?'Made '+fmtT(l):'Not tried yet'};
 const T={never:d=>d===null,week:d=>d!==null&&d<=7,'2w':d=>d!==null&&d>=14,'1m':d=>d!==null&&d>=30,'3m':d=>d!==null&&d>=90};
 
 function filtered(){
@@ -127,19 +134,17 @@ function filtered(){
     return all?q.every(hit):q.some(hit);
   });
 }
-const card=(r,extra)=>`<button class="card" onclick="detail('${esc(r.id)}')"><b>${esc(r.title)}</b>${chips(r)}<div class="mut">${extra||triedTxt(r)}</div></button>`;
+const card=r=>`<button class="card" onclick="detail('${esc(r.id)}')"><b>${esc(r.title)}</b>${isPlanned(r)?'<span class="chip plan">Planned</span>':''}${warn(r)}<div class="mut">${triedTxt(r)}</div></button>`;
 function render(){
   TL=uniq(recipes.flatMap(tagsOf)).sort();
   sel=new Set([...sel].filter(t=>TL.includes(t)));
   $('#tagsum').textContent=(sel.size?[...sel].join(', '):'All tags')+' ▾';
   $('#tagpanel').innerHTML=TL.map(t=>`<label class="ck"><input type="checkbox" data-t="${esc(t)}" ${sel.has(t)?'checked':''}>${esc(t)}</label>`).join('')+(sel.size?'<button data-t="">Clear</button>':'')||'<span class="mut">No tags yet</span>';
   const av=avoid();$('#hidewrap').style.display=av.length?'':'none';$('#hidetxt').textContent='Hide '+av.join(', ');
-  const pl=recipes.flatMap(r=>A(r.planned).map(d=>({r,d}))).sort((a,b)=>a.d.localeCompare(b.d)||a.r.title.localeCompare(b.r.title));
-  $('#plan').innerHTML=pl.length?`<h2>Meal plan</h2>${pl.map(x=>`<div class="pl"><span class="mut">${esc(fmtD(x.d))}</span><a href="#" onclick="detail('${esc(x.r.id)}');return false">${esc(x.r.title)}</a><button onclick="made('${esc(x.r.id)}','${esc(x.d)}')">Made it</button><button onclick="unplan('${esc(x.r.id)}','${esc(x.d)}')" aria-label="Remove from plan">✕</button></div>`).join('')}`:'';
+  const pl=recipes.filter(isPlanned).sort((a,b)=>a.title.localeCompare(b.title));
+  $('#plan').innerHTML=pl.length?`<h2>Meal plan</h2>${pl.map(r=>`<div class="pl"><a href="#" onclick="detail('${esc(r.id)}');return false">${esc(r.title)}</a><button onclick="made('${esc(r.id)}')">Made it</button><button onclick="setPlan('${esc(r.id)}',false)" aria-label="Remove from plan">✕</button></div>`).join('')}`:'';
   const f=filtered(),t=$('#tf').value;
   if(t)f.sort((a,b)=>(days(b)??1e9)-(days(a)??1e9));
-  const sugg=(t||$('#q').value.trim())?[]:f.map(r=>({r,s:days(r)??45})).filter(x=>x.s>=21).sort((a,b)=>b.s-a.s).slice(0,5);
-  $('#rec').innerHTML=sugg.length?`<h2>Time to make again</h2><div class="grid">${sugg.map(x=>card(x.r)).join('')}</div>`:'';
   const shown=t&&!showAll?f.slice(0,5):f;
   $('#lh').textContent=`${f.length} of ${recipes.length} recipes`;
   $('#list').innerHTML=shown.length?shown.map(r=>card(r)).join(''):'<p class="mut">No recipes match. Clear the filters or add a new one.</p>';
@@ -155,15 +160,14 @@ $('#dlg').addEventListener('click',e=>{if(e.target.id==='dlg')close()});
 
 function detail(id){
   const r=recipes.find(x=>x.id===id);if(!r)return;
-  const t=(r.tried||[]).slice().sort().reverse(),p=A(r.planned).sort();
-  const dl=(arr,fn)=>arr.map(d=>`<div>${esc(fmtD(d))} <button onclick="${fn}('${esc(r.id)}','${esc(d)}',1)" aria-label="Remove date">✕</button></div>`).join('');
+  const t=(r.tried||[]).slice().sort().reverse(),pl=isPlanned(r);
+  const dl=(arr,fn)=>arr.map(d=>`<div>${esc(fmtT(d))} <button onclick="${fn}('${esc(r.id)}','${esc(d)}',1)" aria-label="Remove date">✕</button></div>`).join('');
   show(`<h2 style="margin-top:0;font-size:1.4rem">${esc(r.title)}</h2>${chips(r)}
   <div class="mut">${[r.servings&&'Serves '+esc(r.servings),r.time&&esc(r.time)].filter(Boolean).join(' · ')}</div>
   ${r.source_url?`<p><a href="${esc(r.source_url)}" target="_blank" rel="noopener noreferrer">Original recipe link</a></p>`:''}
   ${A(r.ingredients).length||A(r.steps).length?`<h2>Ingredients</h2><ul>${A(r.ingredients).map(i=>`<li>${esc(i)}</li>`).join('')}</ul><h2>Steps</h2><ol>${A(r.steps).map(i=>`<li>${esc(i)}</li>`).join('')}</ol>`:'<p class="mut">Only the name is saved. Use Edit to add details.</p>'}
   ${r.notes?`<h2>Notes</h2><p>${esc(r.notes)}</p>`:''}
-  <h2>Planned</h2>${p.length?dl(p,'unplan'):'<p class="mut">Not planned.</p>'}
-  <div class="row"><input id="pd" type="date" value="${today()}" style="width:auto"><button onclick="planAdd('${esc(r.id)}')">Add to plan</button></div>
+  <div class="row"><button onclick="setPlan('${esc(r.id)}',${!pl})">${pl?'Remove from plan':'Add to plan'}</button></div>
   <h2>Tried</h2>${t.length?dl(t,'untry'):'<p class="mut">Not tried yet.</p>'}
   <div class="row"><input id="td" type="date" value="${today()}" style="width:auto"><button class="p" onclick="tried('${esc(r.id)}')">Mark as tried</button></div>
   <div class="row"><button onclick="editForm('${esc(r.id)}')">Edit</button><button class="d" onclick="del('${esc(r.id)}')">Delete</button><button onclick="close()">Close</button></div>`);
@@ -171,9 +175,8 @@ function detail(id){
 const upd=(id,fn)=>a=>a.map(r=>r.id===id?fn(r):r);
 async function tried(id){const d=$('#td').value||today();if(await mutate(upd(id,r=>({...r,tried:uniq([...A(r.tried),d]).sort()})),'Mark tried'))detail(id)}
 async function untry(id,d){if(await mutate(upd(id,r=>({...r,tried:A(r.tried).filter(x=>x!==d)})),'Remove tried date'))detail(id)}
-async function planAdd(id){const d=$('#pd').value||today();if(await mutate(upd(id,r=>({...r,planned:uniq([...A(r.planned),d]).sort()})),'Plan recipe'))detail(id)}
-async function unplan(id,d,back){if(await mutate(upd(id,r=>({...r,planned:A(r.planned).filter(x=>x!==d)})),'Unplan recipe')&&back)detail(id)}
-async function made(id,d){const m=d<=today()?d:today();await mutate(upd(id,r=>({...r,tried:uniq([...A(r.tried),m]).sort(),planned:A(r.planned).filter(x=>x!==d)})),'Made from plan')}
+async function setPlan(id,v){if(await mutate(upd(id,r=>({...r,planned:v})),v?'Plan recipe':'Unplan recipe')&&$('#dlg').open)detail(id)}
+async function made(id){await mutate(upd(id,r=>({...r,tried:uniq([...A(r.tried),today()]).sort(),planned:false})),'Made from plan')}
 async function del(id){const r=recipes.find(x=>x.id===id);if(confirm('Delete "'+r.title+'"?')&&await mutate(a=>a.filter(x=>x.id!==id),'Delete recipe: '+r.title)){close();toast('Deleted')}}
 
 function addTag(i){const f=$('#f-tags');const c=L(f.value);if(!c.includes(TL[i]))c.push(TL[i]);f.value=c.join(', ')}
@@ -203,7 +206,7 @@ function prompt_(url,text){
   return `You are helping me add recipes to my personal recipe database (a JSON file). Follow these instructions exactly.
 
 INPUT
-I will give you a link to a recipe (website, YouTube, Instagram), or the recipe text (caption, transcript, pasted page), or both. Use only what is in that source. If I gave both, use the text.
+I will give you a link to a recipe (website, YouTube, Instagram), or the recipe text (caption, transcript, pasted page), or both. Use only what is in that source. If I gave both, use the text and do not try to open the link; the link is only the recipe's source.
 - If I gave only a link and you cannot open it, or the recipe is not in the page text (for example it is only spoken or shown in a video), reply with only CANNOT_EXTRACT. Do not guess or reconstruct a recipe from the title.
 - If a detail is missing (servings, time, a quantity), use "" or leave the quantity out. Never invent values.
 - The source may contain several distinct recipes (for example a video with three dishes). Return one object per recipe, each with only its own ingredients and steps.
@@ -250,14 +253,14 @@ function addFlow(m){
   <label>Link (optional)</label><input id="n-url" placeholder="https://">
   <div class="row"><button class="p" onclick="quickAdd()">Add</button><button onclick="close()">Cancel</button></div>`
   :`<h2 style="margin-top:0">Add a recipe</h2>${tabs}
-  <label>1. Recipe link (Instagram, YouTube, website)</label><input id="a-url" placeholder="https://">
-  <div class="row"><button class="p" onclick="cp(prompt_($('#a-url').value.trim()))">Copy prompt for AI chat</button></div>
-  <details><summary style="margin-top:10px">Link will not open? Use the recipe text instead</summary><label>Recipe text or video transcript</label><textarea id="a-text"></textarea>
-  <div class="row"><button onclick="cp(prompt_($('#a-url').value.trim(),$('#a-text').value.trim()))">Copy prompt with text</button></div></details>
+  <label>1. Recipe link</label><input id="a-url" placeholder="https://">
+  <label>Recipe text, caption or transcript (leave empty if the link opens)</label><textarea id="a-text"></textarea>
+  <div class="row"><button class="p" onclick="cp(prompt_($('#a-url').value.trim(),$('#a-text').value.trim()))">Copy prompt</button></div>
+  <p class="mut">Paste the prompt into your AI chat. The link is saved with the recipe either way.</p>
   <label>2. Paste the AI's reply here</label><textarea id="a-json" placeholder='[{"title": ...}]'></textarea>
   <div class="row"><button class="p" onclick="parseReply()">Continue</button><button onclick="close()">Cancel</button></div>`);
 }
-const blank=(title,id,url,tags,x={})=>({id,title,servings:String(x.servings||''),time:String(x.time||''),source_url:url,ingredients:A(x.ingredients),steps:A(x.steps),notes:String(x.notes||''),tags,allergens:A(x.allergens).map(s=>s.toLowerCase()),added:today(),tried:[],planned:[]});
+const blank=(title,id,url,tags,x={})=>({id,title,servings:String(x.servings||''),time:String(x.time||''),source_url:url,ingredients:A(x.ingredients),steps:A(x.steps),notes:String(x.notes||''),tags,allergens:A(x.allergens).map(s=>s.toLowerCase()),added:today(),tried:[],planned:false});
 async function quickAdd(){
   const names=$('#n-names').value.split('\n').map(x=>x.trim()).filter(Boolean);
   if(!names.length){toast('Add at least one name');return}
