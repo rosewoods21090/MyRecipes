@@ -461,11 +461,21 @@
     "servings": "",
     "time": "",
     "source_url": "https://www.instagram.com/reel/DZZXC1eT_yI/",
-    "ingredients": [],
+    "ingredients": [
+      "sweet potato",
+      "banana",
+      "eggs",
+      "peanut butter"
+    ],
     "steps": [],
     "notes": "",
-    "tags": [],
-    "allergens": [],
+    "tags": [
+      "baby",
+      "egg"
+    ],
+    "allergens": [
+      "egg"
+    ],
     "added": "2026-10-29",
     "tried": [],
     "planned": false
