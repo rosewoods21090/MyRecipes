@@ -425,5 +425,40 @@
     "added": "2026-10-29",
     "tried": [],
     "planned": false
+  },
+  {
+    "id": "mvtb5dxz0",
+    "title": "15-Min Instant Veggie Dosa",
+    "servings": "",
+    "time": "15 min",
+    "source_url": "https://www.instagram.com/reel/DZBfE4Mhfx7/",
+    "ingredients": [
+      "1/4 cup Sooji (Semolina)",
+      "1/4 cup Poha (Flattened rice)",
+      "1/2 cup Makhana (Fox nuts)",
+      "Handful of veggies (Carrot, beetroot, tomato, onion, cilantro)",
+      "Pinch of black pepper",
+      "Ghee (for cooking)"
+    ],
+    "steps": [
+      "Soak sooji, poha, and makhana in water for 10 mins.",
+      "In a grinder, add soaked ingredients, veggies, and black pepper. Blend into a smooth batter.",
+      "Heat a pan with ghee. Pour small pancake-sized portions of batter.",
+      "Cook on low-medium heat for 2 mins per side until golden and cooked through."
+    ],
+    "notes": "Suitable for 8+ month babies. No fermentation needed. Soft, fluffy, and easy for little hands to hold for BLW or picky eaters.",
+    "tags": [
+      "baby",
+      "veg",
+      "breakfast",
+      "indian"
+    ],
+    "allergens": [
+      "gluten",
+      "dairy"
+    ],
+    "added": "2026-10-29",
+    "tried": [],
+    "planned": false
   }
 ]
