@@ -213,5 +213,42 @@
     "added": "2026-10-29",
     "tried": [],
     "planned": true
+  },
+  {
+    "id": "mvta2w1n0",
+    "title": "Healthy Kiwi Muffins",
+    "servings": "",
+    "time": "10 min",
+    "source_url": "https://www.instagram.com/reel/Dbp_P_YuYz3/",
+    "ingredients": [
+      "2 kiwis",
+      "1 ripe banana",
+      "2 tbsp oat flour",
+      "2 tbsp milk powder",
+      "1 egg",
+      "1 tsp baking powder"
+    ],
+    "steps": [
+      "Blend the kiwi and banana until smooth.",
+      "Add the oat flour, milk powder, and egg. Mix well.",
+      "Stir in the baking powder.",
+      "Pour the mixture into silicone molds.",
+      "Air fry at 180°C (350°F) for 10 minutes, or until cooked through."
+    ],
+    "notes": "The source describes these muffins as a naturally sweet, soft snack suitable for babies aged 8 months and older.",
+    "tags": [
+      "baby",
+      "egg",
+      "snack",
+      "muffins",
+      "air-fryer"
+    ],
+    "allergens": [
+      "dairy",
+      "egg"
+    ],
+    "added": "2026-10-29",
+    "tried": [],
+    "planned": false
   }
 ]
