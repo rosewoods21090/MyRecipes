@@ -329,5 +329,66 @@
     "added": "2026-10-29",
     "tried": [],
     "planned": false
+  },
+  {
+    "id": "mvtaslol0",
+    "title": "Banana & blueberry oaty bars",
+    "servings": "",
+    "time": "",
+    "source_url": "https://www.instagram.com/reel/DazmrK8OJ0R/",
+    "ingredients": [],
+    "steps": [],
+    "notes": "Batch cooking for 9 month old.",
+    "tags": [
+      "baby",
+      "veg",
+      "snack",
+      "baking"
+    ],
+    "allergens": [],
+    "added": "2026-10-29",
+    "tried": [],
+    "planned": false
+  },
+  {
+    "id": "mvtaslol2",
+    "title": "Broccoli & cheese pinwheels",
+    "servings": "",
+    "time": "",
+    "source_url": "https://www.instagram.com/reel/DazmrK8OJ0R/",
+    "ingredients": [],
+    "steps": [],
+    "notes": "Batch cooking for 9 month old.",
+    "tags": [
+      "baby",
+      "veg",
+      "snack",
+      "baking"
+    ],
+    "allergens": [
+      "dairy"
+    ],
+    "added": "2026-10-29",
+    "tried": [],
+    "planned": false
+  },
+  {
+    "id": "mvtaslol3",
+    "title": "Sweet potato tots",
+    "servings": "",
+    "time": "",
+    "source_url": "https://www.instagram.com/reel/DazmrK8OJ0R/",
+    "ingredients": [],
+    "steps": [],
+    "notes": "Batch cooking for 9 month old.",
+    "tags": [
+      "baby",
+      "veg",
+      "snack"
+    ],
+    "allergens": [],
+    "added": "2026-10-29",
+    "tried": [],
+    "planned": false
   }
 ]
