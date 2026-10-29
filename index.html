@@ -32,7 +32,8 @@ summary{list-style:none;cursor:pointer;border:1px solid var(--line);background:v
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;cursor:pointer;text-align:left;width:100%;position:relative;font:inherit;color:inherit;display:flex;flex-direction:column;justify-content:flex-start;align-items:flex-start}
 .card:hover{border-color:var(--acc)}
-.card b{display:block;margin-bottom:6px;padding-right:76px}
+.card b{display:block;margin-bottom:6px}
+.pc b{padding-right:76px}
 .acts{position:absolute;top:8px;right:8px;display:flex;gap:6px}
 .acts button{padding:1px 9px;line-height:1.5}
 .chip{display:inline-block;background:var(--chip);border-radius:99px;padding:1px 10px;font-size:.8rem;margin:0 4px 4px 0}
@@ -137,8 +138,8 @@ function filtered(){
   });
 }
 const card=(r,m)=>{const id=esc(r.id),b=(fn,t,l)=>`<button title="${l}" aria-label="${l}" onclick="event.stopPropagation();${fn}">${t}</button>`;
-  const acts=m==='plan'?b(`made('${id}')`,'✓','Mark as tried')+b(`setPlan('${id}',false)`,'✕','Remove from plan'):b(`editForm('${id}',1)`,'✎','Edit')+(isPlanned(r)?'':b(`setPlan('${id}',true)`,'+','Add to plan'));
-  return `<div class="card" tabindex="0" role="button" onclick="detail('${id}')" onkeydown="if(event.target===this&&event.key==='Enter')detail('${id}')"><div class="acts">${acts}</div><b>${esc(r.title)}</b>${m!=='plan'&&isPlanned(r)?'<span class="chip plan">Planned</span>':''}${warn(r)}<div class="mut">${triedTxt(r)}</div></div>`};
+  const acts=m==='plan'?b(`made('${id}')`,'✓','Mark as tried')+b(`setPlan('${id}',false)`,'✕','Remove from plan'):'';
+  return `<div class="card${m==='plan'?' pc':''}" tabindex="0" role="button" onclick="detail('${id}')" onkeydown="if(event.target===this&&event.key==='Enter')detail('${id}')"><div class="acts">${acts}</div><b>${esc(r.title)}</b>${m!=='plan'&&isPlanned(r)?'<span class="chip plan">Planned</span>':''}${warn(r)}<div class="mut">${triedTxt(r)}</div></div>`};
 function render(){
   TL=uniq(recipes.flatMap(tagsOf)).sort();
   sel=new Set([...sel].filter(t=>TL.includes(t)));
@@ -166,15 +167,15 @@ function detail(id){
   const r=recipes.find(x=>x.id===id);if(!r)return;
   const t=(r.tried||[]).slice().sort().reverse(),pl=isPlanned(r);
   const dl=(arr,fn)=>arr.map(d=>`<div>${esc(fmtT(d))} <button onclick="${fn}('${esc(r.id)}','${esc(d)}',1)" aria-label="Remove date">✕</button></div>`).join('');
-  show(`<h2 style="margin-top:0;font-size:1.4rem">${esc(r.title)}</h2>${chips(r)}
+  show(`<div class="acts" style="top:14px;right:14px"><button title="Edit" aria-label="Edit" onclick="editForm('${esc(r.id)}')">✎</button><button title="${pl?'Remove from plan':'Add to plan'}" aria-label="${pl?'Remove from plan':'Add to plan'}" onclick="setPlan('${esc(r.id)}',${!pl})">${pl?'✕':'+'}</button></div>
+  <h2 style="margin-top:0;font-size:1.4rem;padding-right:84px">${esc(r.title)}</h2>${pl?'<span class="chip plan">Planned</span>':''}${chips(r)}
   <div class="mut">${[r.servings&&'Serves '+esc(r.servings),r.time&&esc(r.time)].filter(Boolean).join(' · ')}</div>
   ${r.source_url?`<p><a href="${esc(r.source_url)}" target="_blank" rel="noopener noreferrer">Original recipe link</a></p>`:''}
   ${A(r.ingredients).length||A(r.steps).length?`<h2>Ingredients</h2><ul>${A(r.ingredients).map(i=>`<li>${esc(i)}</li>`).join('')}</ul><h2>Steps</h2><ol>${A(r.steps).map(i=>`<li>${esc(i)}</li>`).join('')}</ol>`:'<p class="mut">Only the name is saved. Use Edit to add details.</p>'}
   ${r.notes?`<h2>Notes</h2><p>${esc(r.notes)}</p>`:''}
-  <div class="row"><button onclick="setPlan('${esc(r.id)}',${!pl})">${pl?'Remove from plan':'Add to plan'}</button></div>
   <h2>Tried</h2>${t.length?dl(t,'untry'):'<p class="mut">Not tried yet.</p>'}
   <div class="row"><input id="td" type="date" value="${today()}" style="width:auto"><button class="p" onclick="tried('${esc(r.id)}')">Mark as tried</button></div>
-  <div class="row"><button onclick="editForm('${esc(r.id)}')">Edit</button><button class="d" onclick="del('${esc(r.id)}')">Delete</button><button onclick="close()">Close</button></div>`);
+  <div class="row"><button class="d" onclick="del('${esc(r.id)}')">Delete</button><button onclick="close()">Close</button></div>`);
 }
 const upd=(id,fn)=>a=>a.map(r=>r.id===id?fn(r):r);
 async function tried(id){const d=$('#td').value||today();if(await mutate(upd(id,r=>({...r,tried:uniq([...A(r.tried),d]).sort()})),'Mark tried'))detail(id)}
@@ -183,7 +184,6 @@ async function setPlan(id,v){if(await mutate(upd(id,r=>({...r,planned:v})),v?'Pl
 async function made(id){if(await mutate(upd(id,r=>({...r,tried:uniq([...A(r.tried),today()]).sort(),planned:false})),'Made from plan'))toast('Marked as tried')}
 async function del(id){const r=recipes.find(x=>x.id===id);if(confirm('Delete "'+r.title+'"?')&&await mutate(a=>a.filter(x=>x.id!==id),'Delete recipe: '+r.title)){close();toast('Deleted')}}
 
-function addTag(i){const f=$('#f-tags');const c=L(f.value);if(!c.includes(TL[i]))c.push(TL[i]);f.value=c.join(', ')}
 let ret=false;
 function editForm(id,c){
   ret=!!c;
@@ -191,8 +191,7 @@ function editForm(id,c){
   show(`<h2 style="margin-top:0">Edit recipe</h2>
   <label>Title</label><input id="f-title" value="${esc(r.title)}">
   <label>Tags (comma-separated)</label><input id="f-tags" value="${esc(tagsOf(r).join(', '))}">
-  <div class="tags">${TL.map((t,i)=>`<button class="tg" onclick="addTag(${i})">${esc(t)}</button>`).join('')}</div>
-  <label>Allergens in this recipe (comma-separated, e.g. egg, dairy)</label><input id="f-all" value="${esc(A(r.allergens).join(', '))}">
+    <label>Allergens in this recipe (comma-separated, e.g. egg, dairy)</label><input id="f-all" value="${esc(A(r.allergens).join(', '))}">
   <div class="two"><div><label>Servings</label><input id="f-serv" value="${esc(r.servings)}"></div><div><label>Time</label><input id="f-time" value="${esc(r.time)}"></div></div>
   <label>Source link</label><input id="f-url" value="${esc(r.source_url)}">
   <label>Ingredients (one per line)</label><textarea id="f-ing">${esc(A(r.ingredients).join('\n'))}</textarea>
