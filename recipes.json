@@ -7,10 +7,61 @@
     "servings": "3",
     "time": "30 min",
     "source_url": "",
-    "ingredients": ["1/2 cup rice", "1/2 cup yellow moong dal", "1 tsp ghee", "1/4 tsp turmeric", "3 cups water"],
-    "steps": ["Rinse rice and dal.", "Pressure cook everything for 4 whistles.", "Mash lightly and serve with ghee."],
+    "ingredients": [
+      "1/2 cup rice",
+      "1/2 cup yellow moong dal",
+      "1 tsp ghee",
+      "1/4 tsp turmeric",
+      "3 cups water"
+    ],
+    "steps": [
+      "Rinse rice and dal.",
+      "Pressure cook everything for 4 whistles.",
+      "Mash lightly and serve with ghee."
+    ],
     "notes": "Delete this sample once you add your own recipes.",
-    "tags": ["Indian", "one-pot"],
+    "tags": [
+      "Indian",
+      "one-pot"
+    ],
+    "added": "2026-10-29",
+    "tried": []
+  },
+  {
+    "id": "mvt8qczq",
+    "title": "Suji Appe with Coriander Chutney and Salad",
+    "servings": "",
+    "time": "",
+    "source_url": "https://www.instagram.com/reel/DdTOVZ7O_op/",
+    "ingredients": [
+      "Suji (semolina)",
+      "Curd",
+      "Carrot",
+      "Peas",
+      "A pinch of turmeric",
+      "Jeera powder",
+      "Black pepper powder",
+      "Water",
+      "Ghee",
+      "Mustard seeds",
+      "Coriander chutney",
+      "Salad"
+    ],
+    "steps": [
+      "Combine suji (semolina) and curd in a mixing bowl to make a thick batter. Let it rest for 15–20 minutes.",
+      "Wash, peel, and chop the carrot into small cubes. Steam the carrot.",
+      "Boil a handful of peas until soft and tender.",
+      "Check the suji batter. Add a pinch of turmeric, jeera powder, black pepper powder, and enough water to achieve a pouring consistency.",
+      "Add the chopped vegetables to the batter.",
+      "Heat an appe pan and lightly grease it with ghee. Add mustard seeds and let them splutter.",
+      "Pour the batter into the molds and cook over low to medium heat until golden brown on both sides.",
+      "Serve warm with coriander chutney and salad."
+    ],
+    "notes": "Suitable for babies aged 8 months and older, as indicated in the source.",
+    "tags": [
+      "baby",
+      "suji"
+    ],
     "added": "2026-10-29",
     "tried": []
   }
