@@ -566,5 +566,40 @@
     "added": "2026-10-29",
     "tried": [],
     "planned": false
+  },
+  {
+    "id": "mvulsxqg0",
+    "title": "Carrot Peas Mini Idli",
+    "servings": "",
+    "time": "",
+    "source_url": "",
+    "ingredients": [
+      "Suji (semolina) (2 tbsp)",
+      "Carrot (grated) (2 tbsp)",
+      "Green peas (steamed & mashed) (2 tbsp)",
+      "Curd (2 tbsp)",
+      "Water (as needed)",
+      "Ghee / oil (for greasing)"
+    ],
+    "steps": [
+      "Grate carrot, steam & mash peas. Keep aside.",
+      "Mix suji, curd, water and veggies. Make a smooth batter. Rest for 10-15 mins.",
+      "Pour into mini idli moulds and steam for 8-10 mins.",
+      "Let it cool slightly and serve soft."
+    ],
+    "notes": "You can also add finely chopped spinach or capsicum for extra nutrition and colour! Perfect for 6+ months.",
+    "tags": [
+      "baby",
+      "veg",
+      "breakfast",
+      "indian"
+    ],
+    "allergens": [
+      "gluten",
+      "dairy"
+    ],
+    "added": "2026-10-29",
+    "tried": [],
+    "planned": false
   }
 ]
