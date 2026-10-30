@@ -479,5 +479,62 @@
     "added": "2026-10-29",
     "tried": [],
     "planned": false
+  },
+  {
+    "id": "mvulh9x20",
+    "title": "Malaysian Butter Chicken",
+    "servings": "3",
+    "time": "",
+    "source_url": "https://www.instagram.com/reel/DeV28I6B2HR/",
+    "ingredients": [
+      "Boneless chicken thigh (500g)",
+      "1 egg (50g)",
+      "1 tbsp garlic paste (15g)",
+      "2 green chillies, chopped (10g)",
+      "1 tsp chilli flakes (2g)",
+      "1 tsp curry powder (3g)",
+      "½ tsp pepper (1g)",
+      "1 tbsp soy sauce (15g)",
+      "Salt to taste",
+      "1 sprig curry leaves (2g)",
+      "2 tbsp cornflour (16g)",
+      "1 cup crushed cornflakes (40g)",
+      "1 tbsp light butter (14g)",
+      "1 tbsp chopped garlic (10g)",
+      "2 green chillies, chopped (10g)",
+      "2 sprigs curry leaves (4g)",
+      "1 tsp curry powder (3g)",
+      "1 tsp chilli flakes (2g)",
+      "½ tbsp soy sauce (8g)",
+      "A pinch of salt",
+      "½ cup water (120ml)",
+      "1 zero stock chicken cube",
+      "2 tbsp condensed milk (40g)",
+      "2 tbsp chopped spring onion greens (15g)"
+    ],
+    "steps": [
+      "Mix the chicken with all the marinade ingredients & rest for at least 30 minutes.",
+      "Coat each piece in the crushed cornflakes & air fry at 200°C for 10–11 minutes, flipping halfway, until golden brown & crispy.",
+      "Heat the light butter in a pan, add the garlic, chillies & curry leaves & sauté till fragrant.",
+      "Add the curry powder, chilli flakes, soy sauce, salt, water, stock cube & condensed milk, then simmer for a couple of minutes.",
+      "Toss in the air fried chicken & mix well till coated.",
+      "Finish with chopped spring onion greens & serve hot!"
+    ],
+    "notes": "Curry powder can be swapped with a mix of turmeric, coriander powder & garam masala if you don’t have it.",
+    "tags": [
+      "adult",
+      "chicken",
+      "malaysian",
+      "dinner"
+    ],
+    "allergens": [
+      "egg",
+      "dairy",
+      "gluten",
+      "soy"
+    ],
+    "added": "2026-10-29",
+    "tried": [],
+    "planned": false
   }
 ]
