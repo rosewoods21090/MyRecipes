@@ -601,5 +601,133 @@
     "added": "2026-10-29",
     "tried": [],
     "planned": false
+  },
+  {
+    "id": "mvulv9gv0",
+    "title": "Apple Suji Halwa",
+    "servings": "",
+    "time": "",
+    "source_url": "",
+    "ingredients": [
+      "2 tbsp suji (semolina)",
+      "½ small apple, peeled & finely grated",
+      "1 tsp ghee",
+      "Water as needed"
+    ],
+    "steps": [
+      "Heat ghee and gently roast suji until fragrant.",
+      "Add water and grated apple; cook, stirring, until soft and smooth.",
+      "Cool to a safe temperature and serve."
+    ],
+    "notes": "No added sugar or honey. For babies 8+ months – serve soft, and adapt texture to your baby.",
+    "tags": [
+      "baby",
+      "veg",
+      "breakfast",
+      "indian"
+    ],
+    "allergens": [
+      "gluten",
+      "dairy"
+    ],
+    "added": "2026-10-29",
+    "tried": [],
+    "planned": false
+  },
+  {
+    "id": "mvulv9gv1",
+    "title": "Sweet Potato Tikki",
+    "servings": "",
+    "time": "",
+    "source_url": "",
+    "ingredients": [
+      "Sweet potato (boiled & mashed) (1 small)",
+      "Spinach (finely chopped) (2 tbsp)",
+      "Paneer (grated) (2 tbsp)",
+      "Rice flour (1-2 tbsp)",
+      "Water (as needed)"
+    ],
+    "steps": [
+      "Mix mashed sweet potato, spinach, paneer, rice flour and a little water to make a soft dough.",
+      "Shape small tikkis.",
+      "Cook on a tawa with a little ghee on low flame until golden and soft.",
+      "Serve warm and enjoy!"
+    ],
+    "notes": "You can also add a pinch of cumin or herbs for extra flavour (if suitable). Suitable for 8+ months.",
+    "tags": [
+      "baby",
+      "veg",
+      "snack",
+      "indian"
+    ],
+    "allergens": [
+      "dairy"
+    ],
+    "added": "2026-10-29",
+    "tried": [],
+    "planned": false
+  },
+  {
+    "id": "mvulv9gv2",
+    "title": "Paneer Veggie Chila",
+    "servings": "",
+    "time": "",
+    "source_url": "",
+    "ingredients": [
+      "Besan (gram flour) (3 tbsp)",
+      "Paneer (grated) (2 tbsp)",
+      "Carrot (grated) (2 tbsp)",
+      "Capsicum (finely chopped) (2 tbsp)",
+      "Cumin powder (½ tsp + pinch of turmeric)",
+      "Water (as needed)",
+      "Oil / ghee (for cooking)"
+    ],
+    "steps": [
+      "Mix besan, grated paneer, veggies, spices and water to make a smooth batter.",
+      "Heat a little oil on a pan and pour a ladleful of batter. Spread gently.",
+      "Cook on low flame until golden, then flip and cook the other side.",
+      "Serve warm with curd or homemade chutney. Enjoy!"
+    ],
+    "notes": "You can also add spinach or finely chopped methi for extra nutrition and colour! Perfect for 6+ months.",
+    "tags": [
+      "baby",
+      "veg",
+      "breakfast",
+      "indian"
+    ],
+    "allergens": [
+      "dairy"
+    ],
+    "added": "2026-10-29",
+    "tried": [],
+    "planned": false
+  },
+  {
+    "id": "mvulv9gv3",
+    "title": "Banana Ragi Pancakes",
+    "servings": "",
+    "time": "",
+    "source_url": "",
+    "ingredients": [
+      "Ragi flour (2 tbsp)",
+      "Mashed banana (1 small)",
+      "Water (as needed)"
+    ],
+    "steps": [
+      "Mix ragi flour, mashed banana and water to make a smooth batter.",
+      "Pour small pancakes on a greased pan and cook on low flame.",
+      "Cook until golden and soft."
+    ],
+    "notes": "Use a non-stick pan for easy flipping. Suitable for 6+ months.",
+    "tags": [
+      "baby",
+      "veg",
+      "breakfast",
+      "indian"
+    ],
+    "allergens": [],
+    "added": "2026-10-29",
+    "tried": [],
+    "planned": false
   }
 ]
